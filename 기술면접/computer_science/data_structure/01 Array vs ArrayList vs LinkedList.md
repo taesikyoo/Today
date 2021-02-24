@@ -1,3 +1,5 @@
+# 01 Array vs ArrayList vs LinkedList
+
 ### 요약
 
 - **Array**는 index로 빠르게 값을 찾는 것이 가능함
