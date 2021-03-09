@@ -42,3 +42,24 @@
 
 - Structured Query Language (구조화된 질의 언어)
 - 데이터베이스와 소통하기 위해 고안된 언어
+
+# 2장 데이터 가져오기
+
+```mysql
+# 행의 중복 출력 방지하기
+-- distinct 키워드는 모든 열에 일괄 적용된다. 하나의 열에만 부분적으로 적용할 수는 없다.
+select distinct vend_id from products;
+select distinct vend_id, prod_price from products;
+select vend_id, prod_price from products;
+
+# 결과 제한하기
+select prod_name from products limit 5;
+select prod_name from products limit 5 offset 5;
+select prod_name from products limit 4 offset 3;
+select prod_name from products limit 3, 4;
+```
+
+- limit : 몇 개의 행을 가져올지
+- offset : 몇 번째 행부터 가져올지 (index는 0부터 시작)
+- limit 4 offset 3 = limit 3,4 (순서가 반대니 주의할 것) 
+
