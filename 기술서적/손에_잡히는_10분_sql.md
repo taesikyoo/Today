@@ -63,3 +63,19 @@ select prod_name from products limit 3, 4;
 - offset : 몇 번째 행부터 가져올지 (index는 0부터 시작)
 - limit 4 offset 3 = limit 3,4 (순서가 반대니 주의할 것) 
 
+# 3장 가져온 데이터 정렬하기
+
+- ORDER BY 절은 SELECT 문의 가장 마지막에 와야하는 것을 기억하자.
+
+```mysql
+# 여러 개의 열로 정렬하기
+select prod_id, prod_price, prod_name from products order by prod_price, prod_name;
+# 열의 위치로 정렬하기
+select prod_id, prod_price, prod_name from products order by 2, 3; -- 위 sql과 결과가 같음
+
+# 정렬 순서 지정하기
+select prod_id, prod_price, prod_name from products order by prod_price desc, prod_name;
+```
+
+- DESC 키워드는 명시된 열에만 적용된다. 오름차순 정렬(ASC)이 기본값
+
