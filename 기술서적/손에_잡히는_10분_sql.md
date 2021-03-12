@@ -43,7 +43,7 @@
 - Structured Query Language (구조화된 질의 언어)
 - 데이터베이스와 소통하기 위해 고안된 언어
 
-# 2장 데이터 가져오기
+# 2장 데이터 가져오기 (select)
 
 ```mysql
 # 행의 중복 출력 방지하기
@@ -63,7 +63,7 @@ select prod_name from products limit 3, 4;
 - offset : 몇 번째 행부터 가져올지 (index는 0부터 시작)
 - limit 4 offset 3 = limit 3,4 (순서가 반대니 주의할 것) 
 
-# 3장 가져온 데이터 정렬하기
+# 3장 가져온 데이터 정렬하기 (order by)
 
 - ORDER BY 절은 SELECT 문의 가장 마지막에 와야하는 것을 기억하자.
 
@@ -79,3 +79,17 @@ select prod_id, prod_price, prod_name from products order by prod_price desc, pr
 
 - DESC 키워드는 명시된 열에만 적용된다. 오름차순 정렬(ASC)이 기본값
 
+# 4장 데이터 필터링 (where)
+
+- where절은 테이블 이름(from절) 바로 다음에 적는다.
+
+```mysql
+# BETWEEN
+select prod_name, prod_price from products where prod_price between 5 and 10;
+
+# IS NULL
+select cust_name from customers where cust_email is null;
+```
+
+- BETWEEN은 시작 값과 종료 값을 **포함**하여 지정된 범위의 모든 데이터를 가져온다.
+- 특정한 값이 없는 행을 검색하면 NULL을 가진 행을 반환할 것이라고 기대하겠지만, 그렇지 않다.
