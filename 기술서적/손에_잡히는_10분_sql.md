@@ -93,3 +93,32 @@ select cust_name from customers where cust_email is null;
 
 - BETWEEN은 시작 값과 종료 값을 **포함**하여 지정된 범위의 모든 데이터를 가져온다.
 - 특정한 값이 없는 행을 검색하면 NULL을 가진 행을 반환할 것이라고 기대하겠지만, 그렇지 않다.
+
+# 5장 고급 데이터 필터링 (and, or, not, in)
+
+```mysql
+# IN
+select prod_name, prod_price from products 
+where vend_id in ('DLL01', 'BRS01')
+order by prod_name;
+
+select prod_name, prod_price from products 
+where vend_id = 'DLL01' or vend_id = 'BRS01'
+order by prod_name;
+
+-- in과 or는 같은 일을 수행한다.
+```
+
+- IN 연산자의 장점
+  - 조건이 많을 떄 OR보다 가독성이 좋음
+  - AND나 OR 연산자와 함께 사용할 때 연산자 우선순위를 관리하기 편함
+  - OR가 목록을 처리하는 속도보다 빠름
+  - **IN 안에 SELECT 문을 포함 가능** 
+
+```mysql
+# NOT
+select prod_name from products 
+where NOT vend_id = 'DLL01'
+order by prod_name;
+```
+
