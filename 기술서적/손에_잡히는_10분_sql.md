@@ -122,3 +122,50 @@ where NOT vend_id = 'DLL01'
 order by prod_name;
 ```
 
+# 6장 와일드카드 문자를 이용한 필터링 (like, %, _, [ ])
+
+- 와일드카드 : 여러 데이터에서 부분적으로 일치하는 값이 있는지 확인할 때 사용되는 특수 문자
+- 검색 패턴 : 문자나 와일드카드 또는 이 두 개의 조합으로 구성된 검색 조건
+
+- 와일드카드 검색은 텍스트 열(문자열)에서만 사용 가능
+- LIKE는 술어(predicate)이지 연산자가 아님
+
+```mysql
+# % 와일드카드
+SELECT prod_name
+FROM Products
+WHERE prod_name LIKE 'F%y'
+-- WHERE email LIKE 'b%forta.com'
+-- WHERE prod_name LIKE 'F%y%'(후행 공백에 주의)
+```
+
+- %는 하나 이상의 문자뿐 아니라 0개의 문자를 뜻할 수도 있음 = 0 or 1개 이상
+
+```mysql
+# _ 와일드카드
+SELECT prod_id, prod_name
+FROM Products
+WHERE prod_name LIKE '__ inch teddy bear'; -- '__ inch teddy bear%';
+```
+
+- _는 반드시 한 개의 문자와 매칭됨
+
+```mysql
+# 집합 와일드카드
+SELECT cust_contact
+FROM Customers
+WHERE cust_contact LIKE '[JM]%' 
+ORDER BY cust_contact;
+-- J 또는 M으로 시작하는 연락처 찾기, [] 안에 있는 문자 중 '하나'와 일치해야함
+-- '[^JM]%' 캐럿 기호를 사용하면 not을 의미, = WHERE NOT
+```
+
+- 와일드카드로 시작하는 검색 패턴을 처리가 느리므로 꼭 필요한 경우에 사용하자
+
+```mysql
+# 도전 과제
+select prod_name, prod_desc from products where not prod_desc like '%toy%' order by prod_name;
+select prod_name, prod_desc from products where (prod_desc like '%toy%') and (prod_desc like '%carrots%');
+select prod_name, prod_desc from products where prod_desc like '%toy%carrots%' order by prod_name;
+```
+
