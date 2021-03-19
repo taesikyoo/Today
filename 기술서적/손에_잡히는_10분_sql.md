@@ -169,3 +169,83 @@ select prod_name, prod_desc from products where (prod_desc like '%toy%') and (pr
 select prod_name, prod_desc from products where prod_desc like '%toy%carrots%' order by prod_name;
 ```
 
+# 7장 계산 필드 생성하기 (concat, as, 사칙연산)
+
+- 계산 필드 : 열과 유사하지만 데이터베이스 테이블에 실제로 존재하지 않고 SQL SELECT 문을 통해 동적으로 생성됨
+
+```mysql
+# 필드 연결하기
+SELECT RTRIM(vend_name) + ' (' + RTRIM(vend_country) + ')' ...
+SELECT RTRIM(vend_name) || ' (' || RTRIM(vend_country) || ')' ... -- DB2, Oracle, PostgreSQL, SQLite
+SELECT Concat(vend_name, ' (', vend_country, ')') ... -- MySQL, MariaDB
+```
+
+- RTRIM(), LTRIM(), TRIM() : 오른쪽, 왼쪽, 양쪽 공백 제거
+
+```mysql
+# 별칭 사용하기
+SELECT Concat(vend_name, ' (', vend_country, ')')
+	   AS vend_title
+FROM vendors
+ORDER BY vend_name;
+```
+
+- 별칭(alias) : 하나의 필드나 값을 부르기 위한 또 다른 이름 = 파생열(derived coulumn)
+
+```mysql
+# 도전 과제
+select vend_id as vname, vend_name, vend_address as vaddress, vend_city as vcity
+from vendors
+order by vname;
+
+select prod_id, prod_price, (prod_price * 0.9) as sale_pricce
+from products;
+```
+
+# 8장 데이터 조작 함수 사용하기
+
+- SQL 함수는 각 DBMS에 종속적 -> 호환성이 낮음
+
+- 문자열 조작 함수
+
+  | 함수                                 | 설명                                     |
+  | ------------------------------------ | ---------------------------------------- |
+  | LEFT() (또는 문자열 추출 함수 사용)  | 문자열 왼쪽에서부터 문자열 일부를 추출   |
+  | RIGHT() (또는 문자열 추출 함수 사용) | 문자열 오른쪽에서부터 문자열 일부를 추출 |
+  | LENGTH() (또는 DATALENGTH()나 LEN()) | 문자열의 길이를 반환                     |
+  | LOWER()                              | 문자열을 소문자로 변환                   |
+  | UPPER()                              | 문자열을 대문자로 변환                   |
+  | LTRIM()                              | 문자열의 왼쪽에 있는 공백 문자를 삭제    |
+  | RTRIM()                              | 문자열의 오른쪽에 있는 공백 문자를 삭제  |
+  | SUBSTR() 또는 SUBSTRING()            | 문자열의 일부분 추출                     |
+  | SOUNDEX()                            | 문자열의 SOUNDEX 값을 반환               |
+
+  - SOUNDEX()는 문자열을 소리 나는 대로 표현하는 문자열 변환 알고리즘
+
+    ```mysql
+    SELECT cust_name, cust_contact
+    FROM Customers
+    WHERE SOUNDEX(cust_contact) = SOUNDEX('Michael Green'); -- Michelle Green을 검색 가능
+    ```
+
+- 날짜와 시간 조작 함수
+  - 거의 호환되지 않음
+  - e.g. DATEPART(), DATE_PART(), EXTRACT(), YEAR(), strftime() 등
+- 수치 조작 함수
+  - ABS(), COS(), SIN(), TAN(), EXP(), PI(), SQRT() 등
+
+```mysql
+# 도전 과제
+select cust_id, cust_name, 
+	   concat(upper(left(cust_contact, 2)), upper(left(cust_city, 3))) 
+	   as user_login
+from customers;
+
+select order_num, order_date
+from orders
+where (year(order_date) = 2020) and (month(order_date) = 1)
+order by order_date; 
+```
+
+
+
