@@ -232,6 +232,7 @@ from products;
   - 거의 호환되지 않음
   - e.g. DATEPART(), DATE_PART(), EXTRACT(), YEAR(), strftime() 등
 - 수치 조작 함수
+  
   - ABS(), COS(), SIN(), TAN(), EXP(), PI(), SQRT() 등
 
 ```mysql
@@ -247,5 +248,67 @@ where (year(order_date) = 2020) and (month(order_date) = 1)
 order by order_date; 
 ```
 
+# 9장 데이터 요약 (AVG(), COUNT(), MAX(), MIN(), SUM())
 
+- **그룹 함수** : 여러 행에 대한 연산을 수행하고, 하나의 값을 반환하는 함수
+  - AVG(), COUNT(), MAX(), MIN(), SUM()
 
+- AVG() 함수는 하나의 열만 사용 가능, NULL은 무시
+- COUNT()
+  - COUNT(*)은 NULL을 포함
+  - COUNT(열 이름)은 NULL을 무시
+- MAX()와 MIN()
+  - NULL을 무시
+  - 문자열 데이터에 사용하면 사전순으로 정렬된 열에서 가장 마지막/처음 행을 반환
+- SUM()은 NULL을 무시
+
+```mysql
+# 중복되는 값에 대한 그룹 함수
+select avg(distinct prod_price) as avg_price
+from products
+where vend_id = 'DLL01';
+```
+
+- 중복되는 값을 제거하기 위해 DISTINCT 키워드를 사용
+  - COUNT(*)와는 함께 사용할 수 없음
+  - DISTINCT를 사용하지 않으면 ALL로 인식
+  - cf. TOP, TOP PERCENT 등은 일부분을 계산
+
+# 10장 데이터 그룹핑 (GROUP BY, HAVING)
+
+- GROUP BY
+  - GROUP BY 절은 DBMS에게 먼저 데이터를 그룹핑한 후, 각각의 그룹에 대해 계산하라고 지시한다.
+  - 중첩(nested) 그룹을 만들 수 있음, 데이터는 마지막으로 지정된 그룹에서 요약됨
+  - GROUP BY 절은 WHERE 절 뒤에 그리고 ORDER BY 절 앞에 와야 한다.
+
+```mysql
+# 그룹 필터링
+select cust_id, count(*) as orders
+from orders
+group by cust_id
+having count(*) >= 2;
+```
+
+- HAVING
+  - WHERE 절은 행을 필터링하고, HAVING 절은 그룹을 필터링한다.
+  - **WHERE 절은 데이터가 그룹핑 되기 전에 필터링하고, HAVING 절은 데이터가 그룹핑된 후에 필터링한다.**
+  - **WHERE 절에서 필터링되어 제거된 행은 그룹에 포함되지 않는다.**
+
+  - GROUP BY 절이 있을 때만 HAVING 절을 사용하고, 행 단위로 필터링할 때는 WHERE 절을 사용하도록 하자.
+
+```mysql
+select vend_id, count(*) as num_prods
+from products
+where prod_price >= 4
+group by vend_id
+having count(*) >= 2;
+
+# 그룹핑과 정렬
+select order_num, count(*) as items
+from orderitems
+group by order_num
+having count(*) >= 3
+order by items, order_num;
+```
+
+- SELECT 문 순서 : **SELECT - FROM - WHERE - GROUP BY - HAVING - ORDER BY**
