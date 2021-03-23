@@ -312,3 +312,42 @@ order by items, order_num;
 ```
 
 - SELECT 문 순서 : **SELECT - FROM - WHERE - GROUP BY - HAVING - ORDER BY**
+
+# 11장 서브쿼리 사용하기
+
+```mysql
+# 서브쿼리로 필터링하기
+select cust_name, cust_contact
+from customers
+where cust_id in (select cust_id
+				  from orders
+				  where order_num in (select order_num
+									  from orderitems
+									  where prod_id = 'RGAN01'));
+
+# 계산 필드로 서브쿼리 사용하기
+select cust_name,
+	   cust_state,
+	   (select count(*)
+        from orders
+        where orders.cust_id = customers.cust_id) as orders
+from customers
+order by cust_name;
+```
+
+```mysql
+# 도전 과제
+select cust_id,
+	   (select sum(item_price * quantity)
+        from orderitems
+       	where orders.order_num = orderitems.order_num) as total_ordered
+from orders
+order by total_ordered desc;
+
+select prod_name, 
+	   (select sum(quantity)
+        from orderitems
+        where products.prod_id = orderitems.prod_id) as quant_sold
+from products;
+```
+
