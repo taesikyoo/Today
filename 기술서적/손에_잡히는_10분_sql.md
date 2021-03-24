@@ -351,3 +351,119 @@ select prod_name,
 from products;
 ```
 
+# 12장 테이블 조인
+
+## 조인 이해하기
+
+**관계형 테이블 이해하기**
+
+- 같은 데이터를 여러 곳에 저장하지 않는 것은 관계형 데이터베이스 디자인의 기본 원리
+
+- 관계형 데이터베이스는 비관계형 데이터베이스보다 확장성이 좋다.
+
+  - 확장성(scale) : 증가하는 양의 데이터를 적절히 처리하는 것
+
+  - cf. [RDBMS vs. NoSQL](https://devuna.tistory.com/25)
+
+**왜 조인을 사용할까?**
+
+- 조인은 SELECT 문 안에서 테이블을 연결할 때 사용하는 메커니즘
+
+## 조인 생성하기
+
+- 포함하려는 모든 테이블과 각 테이블 사이의 관계를 명시하면 조인을 생성할 수 있다.
+
+```mysql
+select vend_name, prod_name, prod_price
+from vendors, products
+where vendors.vend_id = products.vend_id;
+```
+
+- 카티전 곱(Cartesian Product) : 두 개 이상의 테이블에서 연결 가능한 행을 모두 결합하는 조인 방법 (WHERE 절에서 조인 조건절을 생략했을 때) => 상호 조인(Cross Join)
+
+- 조인을 사용할 때 WHERE 절이 있는지 그리고 올바른지 꼭 확인하자.
+
+**내부 조인**
+
+- 동등 조인, 이퀴 조인(Equi-Join), 내부 조인(Inner Join)
+  - 두 개의 테이블에 있는 공통 열의 값이 같은 것을 결과로 가져옴
+
+```mysql
+select vend_name, prod_name, prod_price
+from vendors inner join products
+  on vendors.vend_id = products.vend_id;
+```
+
+**여러 개의 테이블 조인하기**
+
+```mysql
+select cust_name, cust_contact
+from customers
+where cust_id in (select cust_id
+				  from orders
+				  where order_num in (select order_num
+									  from orderitems
+									  where prod_id = 'RGAN01'));
+
+select cust_name, cust_contact
+from customers, orders, orderitems
+where customers.cust_id = orders.cust_id
+  and orderitems.order_num = orders.order_num
+  and prod_id = 'RGAN01';
+```
+
+```mysql
+# 도전 과제
+#1
+select cust_name, order_num
+from customers, orders
+where customers.cust_id = orders.cust_id
+order by cust_name, order_num;
+
+select cust_name, order_num
+from customers inner join orders
+on customers.cust_id = orders.cust_id
+order by cust_name, order_num;
+
+#2
+select cust_name, orders.order_num, sum(item_price*quantity) as OrderTotal
+from customers, orders, orderitems
+where customers.cust_id = orders.cust_id
+  and orders.order_num = orderitems.order_num
+group by cust_name, orders.order_num
+order by cust_name, order_num; 
+
+select cust_name, order_num, 
+	   (select sum(item_price*quantity) 
+        from orderitems 
+        where orders.order_num = orderitems.order_num) as OrderTotal
+from customers, orders
+where customers.cust_id = orders.cust_id
+order by cust_name, order_num;
+
+#3
+select cust_id, order_date
+from orderitems, orders
+where orderitems.prod_id = 'BR01'
+  and orderitems.order_num = orders.order_num;
+order by order_date;
+
+#4
+select customers.cust_id, cust_email, order_date
+from orderitems 
+	inner join orders on orderitems.order_num = orders.order_num
+	inner join customers on orders.cust_id = customers.cust_id
+where orderitems.prod_id = 'BR01'
+order by order_date;
+
+#5
+select cust_name, sum(item_price * quantity) as total_price
+from customers
+	inner join orders on orders.cust_id = customers.cust_id
+	inner join orderitems on orderitems.order_num = orders.order_num
+group by cust_name
+
+having sum(item_price * quantity) >= 1000
+order by cust_name;
+```
+
