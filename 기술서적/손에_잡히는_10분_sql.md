@@ -467,3 +467,93 @@ having sum(item_price * quantity) >= 1000
 order by cust_name;
 ```
 
+# 13장 고급 테이블 조인 생성하기
+
+**테이블 별칭 사용하기**
+
+```mysql
+select cust_name, cust_contact
+from customers as c, orders as o, orderitems as oi
+where c.cust_id = o.cust_id
+  and oi.order_num = o.order_num
+  and prod_id = 'RGAN01';
+```
+
+**셀프 조인(Self Join)**
+
+- 같은 테이블에서 데이터를 두 번 이상 참조할 때 사용
+- 똑같은 테이블을 참조할 때 모호성을 해결하기 위해 별칭을 사용
+- 셀프 조인이 서브쿼리보다 빠름 (많은 DBMS에서) 
+
+```mysql
+select cust_id, cust_name, cust_contact
+from customers
+where cust_name = (select cust_name
+                   from customers
+                   where cust_contact  = 'Jim Jones');
+
+select c1.cust_id, c1.cust_name, c1.cust_contact
+from customers as c1, customers as c2
+where c1.cust_name = c2.cust_name AND c2.cust_contact = 'Jim Jones';
+```
+
+**자연 조인(Natural Join)**
+
+- 테이블을 조인할 때, 한 개 이상의 테이블에서 최소한 하나의 열은 있어야 한다.
+- 표준적인 조인은 같은 열이 여러 번 나타나더라도 모든 데이터를 반환한다.
+- 자연 조인은 여러 번 반복되는 열을 제거하여 각 열이 한 번만 반환되는 것을 말한다.
+- 일반적으로 한 테이블에서는 와일드카드를 사용하고, 다른 테이블에서는 가져올 열을 명시하여 만든다.
+- 일반적으로 사용하는 내부 조인은 실제로는 자연 조인이다. 
+
+```mysql
+select c.*, o.order_num, o.order_date,
+	   oi.prod_id, oi.quantity, oi.item_price
+from customers as c, orders as o, orderitems as oi
+where c.cust_id = o.cust_id
+  and oi.order_num = o.order_num
+  and prod_id = 'RGAN01';
+```
+
+**외부 조인(Outer Join)**
+
+- 연결된 테이블에서 관련이 없는 행까지 가져오고 싶을 때 사용
+- RIGHT나 LEFT 키워드를 명시해 어떤 테이블에 있는 행을 모두 가져올지 명시해야 함
+
+```mysql
+select customers.cust_id, orders.order_num
+from customers left outer join orders
+  on customers.cust_id = orders.cust_id;
+
+# 전체 외부 조인 (except MariaDB, MySQL, SQLite)
+select customers.cust_id, orders.order_num
+from customers full outer join orders
+  on customers.cust_id = orders.cust_id;
+```
+
+```mysql
+# 도전 과제
+select customers.cust_name, orders.order_num
+from customers inner join orders
+on customers.cust_id = orders.cust_id;
+
+select customers.cust_name, orders.order_num
+from customers left outer join orders
+on customers.cust_id = orders.cust_id;
+
+select products.prod_name, orderitems.order_num
+from products left outer join orderitems
+on products.prod_id = orderitems.prod_id
+order by prod_name;
+
+select products.prod_name, count(orderitems.order_num)
+from products left outer join orderitems
+on products.prod_id = orderitems.prod_id
+group by products.prod_name
+order by prod_name;
+
+select v.vend_id, count(p.prod_id)
+from vendors as v left outer join products as p
+on v.vend_id = p.vend_id
+group by v.vend_id;
+```
+
