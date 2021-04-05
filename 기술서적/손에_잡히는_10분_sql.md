@@ -43,7 +43,7 @@
 - Structured Query Language (구조화된 질의 언어)
 - 데이터베이스와 소통하기 위해 고안된 언어
 
-# 2장 데이터 가져오기 (select)
+# 2장 데이터 가져오기 (select, limit, offset)
 
 ```mysql
 # 행의 중복 출력 방지하기
