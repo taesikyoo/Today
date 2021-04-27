@@ -37,8 +37,8 @@ public class ListQueueImpl<E> implements ListQueue<E> {
 
         E frontItem = front.getItem();
         front = front.getNext();
-        if (isEmpty()) rear = null;
         size--;
+        if (isEmpty()) rear = null;
         return frontItem;
     }
 }
